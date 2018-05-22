@@ -19,6 +19,7 @@ public class TextController : MonoBehaviour {
 	private Pokemons pokemon_name;
 	private int pokemon_level;
 	private int pokemon_gym_level;
+	private Boolean victory;
 
 
 	// Use this for initialization
@@ -38,6 +39,8 @@ public class TextController : MonoBehaviour {
 		else if (currentState == State.route_0) { Route_0(); }
 		else if (currentState == State.train_1) { Train_1(); }
 		else if (currentState == State.route_1) { Route_1(); }
+		else if (currentState == State.gym_1) { Gym_1(); }
+		else if (currentState == State.end_game) { End_Game(); }
 	}
 
 	void StartGame(){
@@ -98,7 +101,7 @@ public class TextController : MonoBehaviour {
 			            "To level up fight other Pokemon, and for every battle you win your pokemon " +
 			            "goes up 1+ level if the enemy pokemon is higher level then you will lose the battle!!\n" +
 			            "Press C to Continue...";
-		if (Input.GetKeyDown(KeyCode.C))        { currentState = State.train_1_pre; }
+		if      (Input.GetKeyDown(KeyCode.C))   { currentState = State.train_1_pre; }
 		    
 	}
 
@@ -120,15 +123,44 @@ public class TextController : MonoBehaviour {
 	void Train_1(){
 		mytext.text =   "Your pokemon is now strong go face the GYM!\n" +
                         "Press R to go to Route 1\n";
-        if (Input.GetKeyDown(KeyCode.R)) { currentState = State.route_1; }
+        if (Input.GetKeyDown(KeyCode.R))        { currentState = State.route_1; }
 	}
 
 	void Route_1(){
 		mytext.text =   "Trainer you have come so far!!\n\n" +
 			            "Press R to go back to Route 0\n" +
 			            "Press G to battle Gym";
-		if (Input.GetKeyDown(KeyCode.R)) { currentState = State.route_0; }
-		else if (Input.GetKeyDown(KeyCode.T)) { currentState = State.gym_1; }
+		if      (Input.GetKeyDown(KeyCode.R))   { currentState = State.route_0; }
+		else if (Input.GetKeyDown(KeyCode.G))   { currentState = State.gym_1; }
+	}
+
+	void Gym_1(){
+		mytext.text = "You have traveled far and wide becoming stronger as you go, " +
+			"it is time to prove your worth as a Pokemon master, I Mr.X challenge you " +
+            "to a Pokemon battle if you win you get your first Gym badge!\n\n" +
+                "Press B to Battle\n" +
+                "Press R to go back to Route 1";
+		
+		if      (Input.GetKeyDown(KeyCode.R))   { currentState = State.route_1; }
+		else if (Input.GetKeyDown(KeyCode.B))   {
+			pokemon_level = Rand_Level_Generator(); print(pokemon_level);
+			pokemon_gym_level = Rand_Level_Generator(); print(pokemon_gym_level);
+			victory = Battle_Winner(pokemon_level, pokemon_gym_level);
+			currentState = State.end_game;
+		}
+	}
+
+	void End_Game(){
+		if(victory == true){
+			mytext.text =   "Congrats trainer you have earned your first Gym badge!\n\n" +
+				            "Press P to play again!";
+			if (Input.GetKeyDown(KeyCode.P))    { currentState = State.menu; }
+		}
+		else {
+			mytext.text =   "I wish you best of luck next time, keep training hard!\n\n" +
+                            "Press P to play again!";
+            if (Input.GetKeyDown(KeyCode.P))    { currentState = State.menu; }
+		}
 	}
 
 	int Rand_Level_Generator(){
@@ -136,5 +168,10 @@ public class TextController : MonoBehaviour {
 		System.Random random = new System.Random();
 		value = random.Next(5, 21);
 		return value;
+	}
+
+	Boolean Battle_Winner(int your_Pokemon_Lvl, int enemy_Pokemon_Lvl){
+		if (your_Pokemon_Lvl > enemy_Pokemon_Lvl) { return true; }
+		else { return false; }
 	}
 }
